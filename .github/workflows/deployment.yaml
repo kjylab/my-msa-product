@@ -29,7 +29,7 @@ jobs:
           platforms: linux/arm64
           file: ./Containerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ktcloud-msa-product-service:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-msa-product-service:${{ github.sha }}
 
   update-manifest:
     needs: build-and-push
@@ -38,7 +38,7 @@ jobs:
       - name: Checkout Manifest Repo
         uses: actions/checkout@v4
         with:
-          repository: 'kanei0415/ktcloud-market-msa-manifest-values'
+          repository: 'kjylab/my-msa-manifest-values'
           token: ${{ secrets.GH_PAT }}
 
       - name: Update Image Tag
