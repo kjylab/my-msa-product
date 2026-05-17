@@ -31,6 +31,13 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+        force("com.querydsl:querydsl-apt:5.1.0:jakarta")
+    }
+}
+
 sourceSets{
     getByName("main"){
         java {
