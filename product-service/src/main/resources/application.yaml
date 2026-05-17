@@ -2,13 +2,13 @@ spring:
   application:
     name: product-service
   datasource:
-    url: jdbc:postgresql://localhost:7001/product_db
+    url: ${DB_HOST:jdbc:postgresql://postgres.default.svc.cluster.local:5432/product_db}
     username: product-service
     password: product-service
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     generate-ddl: true
     show-sql: true
 
