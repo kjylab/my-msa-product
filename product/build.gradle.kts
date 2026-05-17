@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.jpa")
+    kotlin("kapt")
 }
 
 dependencies {
