@@ -22,6 +22,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Check secret
+        env:
+          PACKAGES_TOKEN: ${{ secrets.GH_PAT }}
+        run: echo "PACKAGES_TOKEN length=${#PACKAGES_TOKEN}"
+
       - name: Build JAR
         env:
           GITHUB_ACTOR: ${{ github.actor }}
