@@ -14,7 +14,12 @@ class ProductPostgresqlQueryRepository(
     private val productMapper: ProductMapper
 ): ProductQueryOutboundPort {
     override fun fetch(id: String): ProductDomainEntity {
-        val optional = repository.findById(UUID.fromString(id))
+        val uuid = try {
+            UUID.fromString(id)
+        } catch (e: IllegalArgumentException) {
+            throw ProductException.NoSuchProductException()
+        }
+        val optional = repository.findById(uuid)
 
         if (!optional.isPresent) throw ProductException.NoSuchProductException()
 
