@@ -4,4 +4,5 @@
 build/
 bin/
 */build/
+!product-service/build/libs/product-service.jar
 */bin/
