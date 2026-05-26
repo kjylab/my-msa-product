@@ -40,7 +40,7 @@ service ProductService {
 | FetchProduct | ID로 단건 조회 (UUID 형식 필요) |
 | FetchAll | 전체 목록 조회 |
 
-> gRPC 포트: **9001** (HTTP: 8080)
+> gRPC 포트: **9090** (HTTP: 8080)
 
 ## 예외 처리 흐름
 
@@ -58,8 +58,24 @@ user-api-gateway GlobalExceptionHandler → HTTP 404
 
 | 포트 | 용도 |
 |------|------|
-| 8080 | HTTP (actuator: /healthz, /actuator/prometheus) |
-| 9001 | gRPC (내부 서비스 통신) |
+| 8080 | HTTP (actuator: /healthz, /prometheus) |
+| 9090 | gRPC (내부 서비스 통신) |
+
+## 관측성 (Observability)
+
+### 메트릭 (Prometheus)
+- `/prometheus` 엔드포인트로 메트릭 노출 (`management.endpoints.web.base-path: /`)
+- HTTP 요청별 latency histogram bucket 활성화 (`percentiles-histogram: true`)
+- ServiceMonitor로 Prometheus가 자동 스크레이프
+
+### 분산 트레이싱 (Tempo)
+- `micrometer-tracing-bridge-otel` + `opentelemetry-exporter-otlp` 사용
+- OTLP HTTP로 Tempo(`tempo.monitoring.svc.cluster.local:4318`)로 전송
+- sampling probability: 1.0 (전량 수집)
+- user-api-gateway → product-service 간 trace context 전파 완료
+
+### 로그-트레이스 연동
+- 로그에 `[traceId-spanId]` 포함 → Grafana Loki에서 Tempo 링크로 바로 이동 가능
 
 ## CI/CD 흐름
 
@@ -77,7 +93,8 @@ GitHub push
 |-----------|------|
 | `my-msa-common` (GitHub Packages) | CustomException, BaseEntity, QueryDSL 설정 |
 | `grpc-spring-boot-starter` | gRPC 서버 |
-| `micrometer-registry-prometheus` | `/actuator/prometheus` 메트릭 노출 |
+| `micrometer-registry-prometheus` | 메트릭 노출 |
+| `micrometer-tracing-bridge-otel` | OTLP 트레이싱 |
 | PostgreSQL | 상품 데이터 저장 |
 
 ## 로컬 Docker 빌드
