@@ -8,6 +8,7 @@ plugins {
 	kotlin("plugin.jpa") version "2.3.20"
 	id("org.springframework.boot") version "3.5.14"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("org.sonarqube") version "5.1.0.4882"
 }
 
 kotlin {
@@ -48,5 +49,27 @@ subprojects {
 
 	tasks.getByName<Jar>("jar") {
 		enabled = true
+	}
+
+	apply(plugin = "jacoco")
+
+	tasks.withType<Test>().configureEach {
+		useJUnitPlatform()
+		finalizedBy(tasks.matching { it.name == "jacocoTestReport" })
+	}
+	tasks.withType<org.gradle.testing.jacoco.tasks.JacocoReport>().configureEach {
+		dependsOn(tasks.withType<Test>())
+		reports { xml.required.set(true) }
+	}
+}
+
+sonar {
+	properties {
+		property("sonar.host.url", "https://sonarcloud.io")
+		property("sonar.organization", "kjylab")
+		property("sonar.projectKey", "kjylab_my-msa-product")
+		property("sonar.qualitygate.wait", "false")
+		property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/test/jacocoTestReport.xml")
+		property("sonar.exclusions", "**/generated/**, **/build/**")
 	}
 }
